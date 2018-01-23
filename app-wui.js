@@ -197,21 +197,21 @@ var recorded  = [];
 let server, openServer, httpOpenServer;
 let serverMdns, openServerMdns;
 
-if (tlsEnabled) {
-	if (basicAuthEnabled) {
-		server = https.createServer(basic, tlsOption, httpServer);
-	} else {
-		server = https.createServer(tlsOption, httpServer);
-	}
-} else {
-	if (basicAuthEnabled) {
-		server = http.createServer(basic, httpServer);
-	} else {
-		server = http.createServer(httpServer);
-	}
-}
-
 if (config.wuiPort) {
+	if (tlsEnabled) {
+		if (basicAuthEnabled) {
+			server = https.createServer(basic, tlsOption, httpServer);
+		} else {
+			server = https.createServer(tlsOption, httpServer);
+		}
+	} else {
+		if (basicAuthEnabled) {
+			server = http.createServer(basic, httpServer);
+		} else {
+			server = http.createServer(httpServer);
+		}
+	}
+
 	server.timeout = 240000;
 
 	server.listen(config.wuiPort, config.wuiHost || '0.0.0.0', function () {
@@ -237,7 +237,11 @@ if (config.wuiPort) {
 
 // Open Server for Access from LAN.
 if (openServerEnabled) {
-	openServer = http.createServer(httpServer);
+	if (basicAuthEnabled) {
+		openServer = http.createServer(basic, httpServer);
+	} else {
+		openServer = http.createServer(httpServer);
+	}
 	openServer.timeout = 0;
 
 	let hostIp = config.wuiOpenHost;
